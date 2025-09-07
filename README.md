@@ -23,6 +23,7 @@ For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrie
 * API documentation with **Swagger UI**
 * Health monitoring via **Spring Actuator**
 * Database management via **pgAdmin**
+* **Unit and Integration Testing** using **JUnit** and **Mockito** for test coverage
 
 ---
 
@@ -35,6 +36,7 @@ For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrie
 * 🐳 **Docker & Docker Compose**
 * 🤖 **Gemini Flash 2.0** (LLM for RAG)
 * ⛓ **Bucket4j** (Rate Limiting)
+* 🧪 **JUnit & Mockito** (Testing & Coverage)
 
 ---
 
@@ -46,6 +48,7 @@ chat-storage-service/
 ├── src/main/resources/
 │   ├── application.yaml           # Default configuration
 │   └── db/changelog/              # Liquibase changelogs
+├── src/test/java/com/raga/chat/   # Unit & Integration tests
 ├── config/env/                    # Environment-specific .env files
 ├── docker-compose.yml             # Multi-container orchestration
 ├── Dockerfile                     # Container build instructions
@@ -186,6 +189,7 @@ docker-compose --env-file ./config/env/dev.env up --build
 * [Gemini Flash 2.0](https://ai.google.dev/gemini-api)
 * [Docker Compose](https://docs.docker.com/compose/)
 * [Bucket4j](https://bucket4j.com/)
+* [JUnit & Mockito](https://junit.org/junit5/docs/current/user-guide/) (Unit and Integration Test Coverage)
 
 ---
 
