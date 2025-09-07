@@ -3,7 +3,7 @@
 A **Java Spring Boot microservice** for storing and managing **chat sessions and messages**.
 Built with **Spring Boot, Gradle, PostgreSQL, Liquibase, and Docker Compose**, this service supports **environment-specific configurations** for **dev, uat, and prod**.
 
-This microservice is designed for **RAG (Retrieval-Augmented Generation) chatbots**, storing conversations securely along with any **retrieved context**.
+Designed for **RAG (Retrieval-Augmented Generation) chatbots**, it securely stores conversations along with any **retrieved context**.
 
 For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrieval**, we leverage **pgvector** in PostgreSQL.
 
@@ -16,6 +16,9 @@ For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrie
 * **Liquibase** for versioned DB migrations
 * **PostgreSQL + pgvector** support for vector embeddings
 * **RAG-ready chat history storage**
+* **Rate limiting** for API requests using **Bucket4j**
+* **API key authentication** for secure access (**X-API-KEY mandatory**)
+* **CORS configuration** to allow cross-origin requests
 * **Docker Compose** for local multi-container deployment
 * API documentation with **Swagger UI**
 * Health monitoring via **Spring Actuator**
@@ -31,6 +34,7 @@ For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrie
 * 🔄 **Liquibase**
 * 🐳 **Docker & Docker Compose**
 * 🤖 **Gemini Flash 2.0** (LLM for RAG)
+* ⛓ **Bucket4j** (Rate Limiting)
 
 ---
 
@@ -67,7 +71,7 @@ cd chat-storage-service
 
 ### 3️⃣ Run with Docker Compose (Environment-Specific)
 
-You can run the service for different environments by selecting the `.env` file:
+Docker automatically picks the correct **application YAML** for the environment via Spring profiles:
 
 * **Development**
 
@@ -87,7 +91,38 @@ docker-compose --env-file ./config/env/uat.env up --build
 docker-compose --env-file ./config/env/prod.env up --build
 ```
 
-✅ **Tip:** The `.env` file contains all environment-specific variables such as ports, database credentials, and Spring profiles. The corresponding application-{profile}.yaml is automatically loaded by Spring Boot based on the profile defined in the .env file.
+✅ **Tip:** The `.env` file contains all environment-specific variables such as ports, database credentials, and Spring profiles. The corresponding `application-{profile}.yaml` is automatically loaded by Spring Boot.
+
+---
+
+## 🔒 Security & API Usage
+
+* **X-API-KEY:** Mandatory for every API request.
+
+    * The **value of X-API-KEY** is **environment-specific** and is defined in the corresponding `.env` file as `API_SECRET_KEY`.
+
+        * Example:
+
+          ```env
+          # dev.env
+          API_SECRET_KEY=dev-secret-key
+    
+          # uat.env
+          API_SECRET_KEY=uat-secret-key
+    
+          # prod.env
+          API_SECRET_KEY=prod-secret-key
+          ```
+    * Each request to the API must include this key in the header:
+
+      ```
+      X-API-KEY: <value from API_SECRET_KEY for the current environment>
+      ```
+* **Rate Limiting:** Requests are limited per API key using **Bucket4j** to prevent abuse.
+
+    * Can be **customized per minute capacity** in the Spring Boot configuration.
+    * If the rate limit is **exceeded within the configured time**, the API responds with **HTTP 429 Too Many Requests**.
+* **CORS:** Configured to allow requests from trusted origins. Can be customized in the Spring Boot configuration.
 
 ---
 
@@ -138,8 +173,7 @@ docker-compose down -v
 docker-compose --env-file ./config/env/dev.env up --build
 ```
 
-* **pgAdmin cannot connect to DB:**
-  Use `db` as host (not `localhost`).
+* **pgAdmin cannot connect to DB:** Use `db` as host (not `localhost`).
 
 ---
 
@@ -151,6 +185,7 @@ docker-compose --env-file ./config/env/dev.env up --build
 * [pgvector Extension](https://github.com/pgvector/pgvector)
 * [Gemini Flash 2.0](https://ai.google.dev/gemini-api)
 * [Docker Compose](https://docs.docker.com/compose/)
+* [Bucket4j](https://bucket4j.com/)
 
 ---
 
