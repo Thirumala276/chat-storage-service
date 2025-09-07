@@ -1,43 +1,53 @@
-# Chat Storage Service
+# 💬 Chat Storage Service
 
-A Java Spring Boot application for storing and managing chat sessions and messages.  
+A **Java Spring Boot microservice** for storing and managing chat sessions and messages.  
 Built with **Spring Boot, Gradle, PostgreSQL, Liquibase, and Docker Compose**.  
 Supports environment-based configuration for **dev/uat/prod**.
 
----
+This is a **backend microservice** designed for **RAG (Retrieval-Augmented Generation) based chatbot systems**.  
+Each conversation between a user and an AI assistant is securely saved, along with any relevant **retrieved context**.
+
+For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrieval**, we leverage **pgvector** inside PostgreSQL.
+
 
 ## 🚀 Features
 
-- RESTful API with **Spring Boot**
-- **Spring Data JPA** for persistence
-- **Liquibase** for database migrations
-- **PostgreSQL with pgvector** support
-- **Docker Compose** for local deployment
-- API documentation with **Swagger UI**
-- Health monitoring via **Spring Actuator**
-- Database management via **pgAdmin**
+- ✅ RESTful API with **Spring Boot**
+- ✅ **Spring Data JPA** for persistence
+- ✅ **Liquibase** for database migrations
+- ✅ **PostgreSQL with pgvector** support
+- ✅ **RAG-ready chat history storage**
+- ✅ **Docker Compose** for local deployment
+- ✅ API documentation with **Swagger UI**
+- ✅ Health monitoring via **Spring Actuator**
+- ✅ Database management via **pgAdmin**
 
 ---
 
 ## 🛠️ Technologies
 
-- Java 17+
-- Spring Boot
-- Gradle
-- PostgreSQL + pgvector
-- Liquibase
-- Docker & Docker Compose
+- ☕ Java 17+
+- 🌱 Spring Boot
+- 🐘 PostgreSQL + pgvector
+- 🔄 Liquibase
+- 🐳 Docker & Docker Compose
+- 🤖 Gemini Flash 2.0 (LLM for RAG)
 
 ---
 
 ## 📂 Project Structure
 
-- `src/main/java/com/raga/chat/` — Source code
-- `src/main/resources/application.yaml` — Default configuration
-- `src/main/resources/db/changelog/` — Liquibase changelogs
-- `docker-compose.yml` — Multi-container orchestration
-- `Dockerfile` — Container build instructions
-- `config/env/` — Environment-specific `.env` files
+```
+chat-storage-service/
+├── src/main/java/com/raga/chat/   # Source code
+├── src/main/resources/
+│   ├── application.yaml           # Default configuration
+│   └── db/changelog/              # Liquibase changelogs
+├── config/env/                    # Environment-specific .env files
+├── docker-compose.yml             # Multi-container orchestration
+├── Dockerfile                     # Container build instructions
+└── build.gradle                   # Gradle build file
+```
 
 ---
 
@@ -60,75 +70,72 @@ docker-compose --env-file ./config/env/dev.env up --build
 ```
 
 This will start:
-- **chat-storage-service** (Spring Boot app)
-- **PostgreSQL** (with pgvector)
-- **pgAdmin**
+- 🟢 **chat-storage-service** (Spring Boot app)
+- 🟢 **PostgreSQL with pgvector**
+- 🟢 **pgAdmin**
 
 ---
 
 ## 🌐 URLs
 
-- **Swagger UI** → [http://localhost:8080/chat/swagger-ui/index.html](http://localhost:8080/chat/swagger-ui/index.html)
-- **pgAdmin** → [http://localhost:9090/login](http://localhost:9090/login)
+- 📖 **Swagger UI** → [http://localhost:8080/chat/swagger-ui/index.html](http://localhost:8080/chat/swagger-ui/index.html)
+- 🐘 **pgAdmin** → [http://localhost:9090/login](http://localhost:9090/login)
     - Email: `admin@company.com`
     - Password: `admin`
-- **Actuator Health** → [http://localhost:8080/chat/actuator/health](http://localhost:8080/chat/actuator/health)
+- ❤️ **Actuator Health** → [http://localhost:8080/chat/actuator/health](http://localhost:8080/chat/actuator/health)
 
 ---
 
 ## 🗄️ Connect pgAdmin to PostgreSQL
 
-1. Open pgAdmin in your browser:  
-   👉 [http://localhost:9090/login](http://localhost:9090/login)
+1. Open pgAdmin: 👉 [http://localhost:9090/login](http://localhost:9090/login)
+    - Email: `admin@company.com`
+    - Password: `admin`
 
-    - **Email:** `admin@company.com`
-    - **Password:** `admin`
+2. Create new server:
+    - **Name:** `Chat Storage DB`
 
-2. After login, right-click on **Servers** → `Create` → `Server`.
-
-3. In the **General** tab:
-    - Name: `Chat Storage DB`
-
-4. In the **Connection** tab:
-    - Host name/address: `db`  
-      *(this is the Docker service name, not `localhost`)*
+3. Connection settings:
+    - Host: `db` (Docker service name)
     - Port: `5432`
     - Username: `postgres`
     - Password: `postgres`
 
-5. Save and connect ✅
-
-You should now see the `chat_storage_dev` database and the schema `chat_storage_schema` (if created via Liquibase).
+✅ You should now see the `chat_storage_dev` database with schema `chat_storage_schema`.
 
 ---
 
 ## 🛠️ Troubleshooting
 
-- **Port already in use (8080, 5432, or 9090):**  
-  Stop any process using those ports or update `SERVER_PORT`, `DB_PORT`, or `PGADMIN_PORT` in your `.env` file.
+- **Port already in use (8080, 5432, or 9090):**
+  ```bash
+  lsof -i :8080
+  kill -9 <PID>
+  ```
+  Or update ports in `.env`.
 
-- **Containers not starting:**  
-  Run:
+- **Containers not starting:**
   ```bash
   docker-compose down -v
   docker-compose --env-file ./config/env/dev.env up --build
   ```
 
 - **pgAdmin cannot connect to DB:**  
-  Use `db` as the host (Docker service name), **not `localhost`**.
+  Use `db` as host (not `localhost`).
 
 ---
 
-## 📖 Reference Documentation
+## 📖 References
 
-- [Gradle Documentation](https://docs.gradle.org)
+- [Gradle Docs](https://docs.gradle.org)
 - [Spring Boot Docs](https://docs.spring.io/spring-boot/docs/current/reference/html/)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
 - [Liquibase Docs](https://www.liquibase.org/documentation/index.html)
+- [pgvector Extension](https://github.com/pgvector/pgvector)
+- [Gemini Flash 2.0](https://ai.google.dev/gemini-api)
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ---
 
 ## 📝 License
-This project is licensed under the MIT License.  
-Feel free to use and modify for your own purposes.
+Licensed under the **MIT License**.  
+Feel free to use and modify for your own purposes.  
