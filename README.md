@@ -87,7 +87,8 @@ docker-compose --env-file ./config/env/uat.env up --build
 docker-compose --env-file ./config/env/prod.env up --build
 ```
 
-✅ Tip: The .env file contains all environment-specific variables such as ports, database credentials, and Spring profiles. The corresponding application-{profile}.yaml is automatically loaded by Spring Boot based on the profile defined in the .env file.
+✅ **Tip:** The `.env` file contains all environment-specific variables such as ports, database credentials, and Spring profiles. The corresponding application-{profile}.yaml is automatically loaded by Spring Boot based on the profile defined in the .env file.
+
 ---
 
 ## 🌐 URLs
