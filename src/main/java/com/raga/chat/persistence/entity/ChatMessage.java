@@ -24,7 +24,7 @@ public class ChatMessage {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "session_id")
+  @JoinColumn(name = "session_id", nullable = false)
   private ChatSession session;
 
   private String sender;

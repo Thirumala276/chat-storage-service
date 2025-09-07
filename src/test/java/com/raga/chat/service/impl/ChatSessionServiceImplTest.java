@@ -66,7 +66,7 @@ class ChatSessionServiceImplTest {
     ChatSession session = new ChatSession();
     session.setId(1L);
 
-    when(chatSessionRepository.findByUserIdAndDeletedAtIsNullOrderByUpdatedAtDesc("user1"))
+    when(chatSessionRepository.findByUserIdOrderByUpdatedAtDesc("user1"))
       .thenReturn(Optional.of(List.of(session)));
 
     List<ChatSession> result = chatSessionService.getSessionsByUserId("user1");
@@ -77,7 +77,7 @@ class ChatSessionServiceImplTest {
 
   @Test
   void testGetSessionsByUserId_notFound() {
-    when(chatSessionRepository.findByUserIdAndDeletedAtIsNullOrderByUpdatedAtDesc("user1"))
+    when(chatSessionRepository.findByUserIdOrderByUpdatedAtDesc("user1"))
       .thenReturn(Optional.empty());
 
     List<ChatSession> result = chatSessionService.getSessionsByUserId("user1");
@@ -140,11 +140,10 @@ class ChatSessionServiceImplTest {
     ChatSession session = new ChatSession();
     session.setId(1L);
     when(chatSessionRepository.findById(1L)).thenReturn(Optional.of(session));
-    when(chatSessionRepository.save(any(ChatSession.class))).thenReturn(session);
-
+    doNothing().when(chatSessionRepository).delete(any(ChatSession.class));
     chatSessionService.deleteSession(1L);
 
-    assertThat(session.getDeletedAt()).isNotNull();
+    verify(chatSessionRepository, times(1)).delete(session);
   }
 
   @Test

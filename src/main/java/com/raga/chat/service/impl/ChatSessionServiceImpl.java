@@ -11,7 +11,6 @@ import com.raga.chat.persistence.repository.ChatMessageRepository;
 import com.raga.chat.persistence.repository.ChatSessionRepository;
 import com.raga.chat.service.ChatSessionService;
 import com.raga.chat.service.LLMService;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,7 @@ public class ChatSessionServiceImpl implements ChatSessionService {
 
   @Override
   public List<ChatSession> getSessionsByUserId(String userId) {
-    return chatSessionRepository.findByUserIdAndDeletedAtIsNullOrderByUpdatedAtDesc(userId)
+    return chatSessionRepository.findByUserIdOrderByUpdatedAtDesc(userId)
                                 .orElse(List.of());
   }
 
@@ -108,14 +107,14 @@ public class ChatSessionServiceImpl implements ChatSessionService {
     return chatSessionRepository.save(session);
   }
 
+
   @Override
   public void deleteSession(Long sessionId) {
     ChatSession session = chatSessionRepository.findById(sessionId)
-                                               .orElseThrow(() -> new ResourceNotFoundException(
-                                                 SESSION_NOT_FOUND));
-    // cascade delete messages first or have DB cascade
-    session.setDeletedAt(Instant.now());
-    chatSessionRepository.save(session);
+                                               .orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
+
+    // Hard delete the session; messages are deleted automatically via cascade
+    chatSessionRepository.delete(session);
   }
 
   @Override

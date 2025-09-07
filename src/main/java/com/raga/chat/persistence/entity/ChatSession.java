@@ -1,12 +1,16 @@
 package com.raga.chat.persistence.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 import lombok.Data;
 
 @Entity
@@ -25,5 +29,7 @@ public class ChatSession {
   private boolean favorite = false;
   private Instant createdAt = Instant.now();
   private Instant updatedAt = Instant.now();
-  private Instant deletedAt;
+
+  @OneToMany(mappedBy = "session",fetch = FetchType.LAZY,  orphanRemoval = true, cascade = CascadeType.ALL)
+  private List<ChatMessage> messages;
 }

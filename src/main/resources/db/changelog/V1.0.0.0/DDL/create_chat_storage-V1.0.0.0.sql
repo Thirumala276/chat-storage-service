@@ -27,8 +27,7 @@ CREATE TABLE chat_sessions (
   title text NOT NULL,
   favorite boolean DEFAULT false,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  deleted_at timestamptz NULL
+  updated_at timestamptz DEFAULT now()
 );
 
 CREATE TABLE chat_messages (
