@@ -1,6 +1,10 @@
 package com.raga.chat.service.impl;
 
 import com.raga.chat.exception.ResourceNotFoundException;
+import com.raga.chat.model.AddMessageRequest;
+import com.raga.chat.model.CreateSessionRequest;
+import com.raga.chat.model.FavoriteRequest;
+import com.raga.chat.model.RenameRequest;
 import com.raga.chat.persistence.entity.ChatMessage;
 import com.raga.chat.persistence.entity.ChatSession;
 import com.raga.chat.persistence.repository.ChatMessageRepository;
@@ -35,10 +39,10 @@ public class ChatSessionServiceImpl implements ChatSessionService {
   private final JdbcTemplate jdbcTemplate;
 
   @Override
-  public ChatSession createSession(String userId, String title) {
+  public ChatSession createSession(CreateSessionRequest request) {
     ChatSession s = new ChatSession();
-    s.setUserId(userId);
-    s.setTitle(title);
+    s.setUserId(request.userId());
+    s.setTitle(request.title());
     return chatSessionRepository.save(s);
   }
 
@@ -59,11 +63,11 @@ public class ChatSessionServiceImpl implements ChatSessionService {
 
   @Transactional
   @Override
-  public ChatMessage addMessage(Long sessionId, String sender, String content) {
+  public ChatMessage addMessage(Long sessionId, AddMessageRequest request) {
     // 1️⃣ Verify session exists
     ChatSession session = chatSessionRepository.findById(sessionId)
                                                .orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
-
+    String content = request.content();
     // 2️⃣ Generate embedding for user message
     Float[] userEmbedding = getEmbedding(content);
 
@@ -74,7 +78,7 @@ public class ChatSessionServiceImpl implements ChatSessionService {
     // 4️⃣ Save user message
     ChatMessage userMessage = new ChatMessage();
     userMessage.setSession(session);
-    userMessage.setSender(sender);
+    userMessage.setSender(request.sender());
     userMessage.setContent(content);
     userMessage.setEmbedding(userEmbedding);
     chatMessageRepository.save(userMessage);
@@ -96,11 +100,11 @@ public class ChatSessionServiceImpl implements ChatSessionService {
 
 
   @Override
-  public ChatSession renameSession(Long sessionId, String title) {
+  public ChatSession renameSession(Long sessionId, RenameRequest request) {
     ChatSession session = chatSessionRepository.findById(sessionId)
                                                .orElseThrow(() -> new ResourceNotFoundException(
                                                  SESSION_NOT_FOUND));
-    session.setTitle(title);
+    session.setTitle(request.title());
     return chatSessionRepository.save(session);
   }
 
@@ -115,11 +119,11 @@ public class ChatSessionServiceImpl implements ChatSessionService {
   }
 
   @Override
-  public ChatSession markFavorite(Long sessionId, boolean favorite) {
+  public ChatSession markFavorite(Long sessionId, FavoriteRequest request) {
     ChatSession session = chatSessionRepository.findById(sessionId)
                                                .orElseThrow(() -> new ResourceNotFoundException(
                                                  SESSION_NOT_FOUND));
-    session.setFavorite(favorite);
+    session.setFavorite(request.favorite());
     return chatSessionRepository.save(session);
   }
 

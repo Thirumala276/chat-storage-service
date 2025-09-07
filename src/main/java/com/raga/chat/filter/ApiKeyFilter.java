@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,14 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
   @Value("${security.api-key}")
   private String apiKey;
+
+  String[] excludedPaths = {
+    "/chat/swagger-ui",
+    "/chat/v3/api-docs",
+    "/chat/actuator",
+    "/swagger-resources",
+    "/webjars"
+  };
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -33,12 +42,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getRequestURI();
-    // Exclude Swagger UI, OpenAPI docs, and Actuator endpoints
-    return path.startsWith("/chat/swagger-ui")
-      || path.startsWith("/chat/v3/api-docs")
-      || path.startsWith("/chat/actuator")
-      || path.startsWith("/swagger-resources")
-      || path.startsWith("/webjars")
-      || path.equals("/chat/swagger-ui.html");
+    return Arrays.stream(excludedPaths).anyMatch(path::startsWith);
   }
+
 }

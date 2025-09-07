@@ -1,5 +1,9 @@
 package com.raga.chat.service;
 
+import com.raga.chat.model.AddMessageRequest;
+import com.raga.chat.model.CreateSessionRequest;
+import com.raga.chat.model.FavoriteRequest;
+import com.raga.chat.model.RenameRequest;
 import com.raga.chat.persistence.entity.ChatMessage;
 import com.raga.chat.persistence.entity.ChatSession;
 import java.util.List;
@@ -7,17 +11,17 @@ import org.springframework.data.domain.Page;
 
 public interface ChatSessionService {
 
-  ChatSession createSession(String userId, String title);
+  ChatSession createSession(CreateSessionRequest req);
 
   List<ChatSession> getSessionsByUserId(String userId);
 
   Page<ChatMessage> getMessages(Long sessionId, int page, int size);
 
-  ChatSession markFavorite(Long sessionId, boolean favorite);
+  ChatSession markFavorite(Long sessionId, FavoriteRequest request);
 
-  ChatMessage addMessage(Long sessionId, String sender, String content);
+  ChatMessage addMessage(Long sessionId, AddMessageRequest request);
 
-  ChatSession renameSession(Long sessionId, String title);
+  ChatSession renameSession(Long sessionId, RenameRequest request);
 
   void deleteSession(Long sessionId);
 

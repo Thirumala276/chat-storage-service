@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @WebMvcTest(ChatSessionController.class)
-public class ChatSessionControllerTest {
+class ChatSessionControllerTest {
 
   @Autowired
   private ChatSessionController chatSessionController;
@@ -38,7 +38,7 @@ public class ChatSessionControllerTest {
     session.setTitle("Session 1");
     session.setUserId("user1");
 
-    when(chatSessionService.createSession(req.userId(), req.title())).thenReturn(session);
+    when(chatSessionService.createSession(req)).thenReturn(session);
 
     ResponseEntity<ChatSession> response = chatSessionController.createSession(req);
 
@@ -65,7 +65,7 @@ public class ChatSessionControllerTest {
     message.setContent("Hello");
     message.setSender("user1");
 
-    when(chatSessionService.addMessage(1L, req.sender(), req.content())).thenReturn(message);
+    when(chatSessionService.addMessage(1L, req)).thenReturn(message);
 
     ResponseEntity<ChatMessage> response = chatSessionController.addMessage(1L, req);
 
@@ -96,7 +96,7 @@ public class ChatSessionControllerTest {
     session.setId(1L);
     session.setTitle("New Title");
 
-    when(chatSessionService.renameSession(1L, req.title())).thenReturn(session);
+    when(chatSessionService.renameSession(1L, req)).thenReturn(session);
 
     ChatSession response = chatSessionController.rename(1L, req);
 
@@ -110,7 +110,7 @@ public class ChatSessionControllerTest {
     session.setId(1L);
     session.setFavorite(true);
 
-    when(chatSessionService.markFavorite(1L, req.favorite())).thenReturn(session);
+    when(chatSessionService.markFavorite(1L, req)).thenReturn(session);
 
     ChatSession response = chatSessionController.favorite(1L, req);
 

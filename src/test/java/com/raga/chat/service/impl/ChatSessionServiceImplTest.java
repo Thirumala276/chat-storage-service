@@ -6,6 +6,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.raga.chat.exception.ResourceNotFoundException;
+import com.raga.chat.model.AddMessageRequest;
+import com.raga.chat.model.CreateSessionRequest;
+import com.raga.chat.model.FavoriteRequest;
+import com.raga.chat.model.RenameRequest;
 import com.raga.chat.persistence.entity.ChatMessage;
 import com.raga.chat.persistence.entity.ChatSession;
 import com.raga.chat.persistence.repository.ChatMessageRepository;
@@ -51,7 +55,7 @@ class ChatSessionServiceImplTest {
 
     when(chatSessionRepository.save(any(ChatSession.class))).thenReturn(session);
 
-    ChatSession result = chatSessionService.createSession("user1", "Session 1");
+    ChatSession result = chatSessionService.createSession(new CreateSessionRequest("user1", "Session 1"));
 
     assertThat(result.getUserId()).isEqualTo("user1");
     assertThat(result.getTitle()).isEqualTo("Session 1");
@@ -112,7 +116,7 @@ class ChatSessionServiceImplTest {
     doReturn("Context").when(chatSessionService).retrieveContext(anyString(), anyLong());
     when(chatMessageRepository.save(any(ChatMessage.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    ChatMessage aiMessage = chatSessionService.addMessage(1L, "user1", "Hello");
+    ChatMessage aiMessage = chatSessionService.addMessage(1L, new AddMessageRequest("user1", "Hello"));
 
     assertThat(aiMessage.getSender()).isEqualTo("AI");
     assertThat(aiMessage.getContent()).isEqualTo("AI Response");
@@ -126,7 +130,7 @@ class ChatSessionServiceImplTest {
     when(chatSessionRepository.findById(1L)).thenReturn(Optional.of(session));
     when(chatSessionRepository.save(any(ChatSession.class))).thenReturn(session);
 
-    ChatSession result = chatSessionService.renameSession(1L, "New Title");
+    ChatSession result = chatSessionService.renameSession(1L, new RenameRequest("New Title"));
 
     assertThat(result.getTitle()).isEqualTo("New Title");
   }
@@ -151,7 +155,7 @@ class ChatSessionServiceImplTest {
     when(chatSessionRepository.findById(1L)).thenReturn(Optional.of(session));
     when(chatSessionRepository.save(any(ChatSession.class))).thenReturn(session);
 
-    ChatSession result = chatSessionService.markFavorite(1L, true);
+    ChatSession result = chatSessionService.markFavorite(1L, new FavoriteRequest(true));
 
     assertThat(result.isFavorite()).isTrue();
   }

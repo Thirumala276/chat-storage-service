@@ -27,37 +27,35 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
   private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
-  private Bucket createNewBucket() {
-    Bandwidth limit = Bandwidth.simple(capacity, Duration.ofMinutes(durationInMinutes));
-    return Bucket.builder().addLimit(limit).build();
+  private Bucket createBucket() {
+    return Bucket.builder()
+                 .addLimit(Bandwidth.simple(capacity, Duration.ofMinutes(durationInMinutes)))
+                 .build();
   }
 
-  private Bucket resolveBucket(String key) {
-    return cache.computeIfAbsent(key, k -> createNewBucket());
+  private Bucket getBucket(String key) {
+    return cache.computeIfAbsent(key, k -> createBucket());
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
     String clientIp = extractClientIp(request);
-    Bucket bucket = resolveBucket(clientIp);
+    Bucket bucket = getBucket(clientIp);
 
     if (bucket.tryConsume(1)) {
       filterChain.doFilter(request, response);
     } else {
-      response.setContentType("application/json");
       response.setStatus(TOO_MANY_REQUESTS.value());
+      response.setContentType("application/json");
       response.getWriter().write("{\"error\":\"Rate limit exceeded for IP: " + clientIp + "\"}");
     }
   }
 
   private String extractClientIp(HttpServletRequest request) {
     String forwarded = request.getHeader("X-Forwarded-For");
-    if (forwarded != null && !forwarded.isBlank()) {
-      return forwarded.split(",")[0].trim();
-    }
-    return request.getRemoteAddr();
+    return (forwarded != null && !forwarded.isBlank())
+           ? forwarded.split(",")[0].trim()
+           : request.getRemoteAddr();
   }
 }

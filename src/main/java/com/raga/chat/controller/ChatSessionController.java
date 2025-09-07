@@ -31,7 +31,7 @@ public class ChatSessionController {
 
   @PostMapping
   public ResponseEntity<ChatSession> createSession(@RequestBody CreateSessionRequest req) {
-    ChatSession session = chatSessionService.createSession(req.userId(), req.title());
+    ChatSession session = chatSessionService.createSession(req);
     return ResponseEntity.status(HttpStatus.CREATED).body(session);
   }
 
@@ -44,7 +44,7 @@ public class ChatSessionController {
   @PostMapping("/{sessionId}/messages")
   public ResponseEntity<ChatMessage> addMessage(@PathVariable Long sessionId,
                                                 @RequestBody AddMessageRequest req) {
-    ChatMessage message = chatSessionService.addMessage(sessionId, req.sender(), req.content());
+    ChatMessage message = chatSessionService.addMessage(sessionId, req);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
@@ -57,12 +57,12 @@ public class ChatSessionController {
 
   @PatchMapping("/{sessionId}/rename")
   public ChatSession rename(@PathVariable Long sessionId, @RequestBody RenameRequest req) {
-    return chatSessionService.renameSession(sessionId, req.title());
+    return chatSessionService.renameSession(sessionId, req);
   }
 
   @PatchMapping("/{sessionId}/favorite")
   public ChatSession favorite(@PathVariable Long sessionId, @RequestBody FavoriteRequest req) {
-    return chatSessionService.markFavorite(sessionId, req.favorite());
+    return chatSessionService.markFavorite(sessionId, req);
   }
 
   @DeleteMapping("/{sessionId}")

@@ -24,6 +24,4 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     @Param("sessionId") Long sessionId,
     @Param("vector") String vector
   );
-
-
 }
