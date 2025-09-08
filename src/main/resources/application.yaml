@@ -4,7 +4,7 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     jpa:
-      show-sql: false
+      show-sql: true
       hibernate:
         ddl-auto: validate
       properties:
@@ -28,6 +28,7 @@ openapi:
   project-description: RAG Chat Storage API
 
 gemini:
+  url : https://generativelanguage.googleapis.com
   model: gemini-2.0-flash
   api-key: ${GEMINI_API_KEY:AIzaSyC-kwpYTB7QN0NkEpn86g1zvsFPG2EvWlU}
 
@@ -43,6 +44,9 @@ rate-limit:
 logging:
   level:
     org.springframework: DEBUG
+    org.hibernate.SQL: DEBUG                   # prints SQL queries
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # prints query parameters
+
 
 management:
   endpoints:

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> {
 
-  Optional<List<ChatSession>> findByUserIdOrderByUpdatedAtDesc(String userId);
+  Optional<List<ChatSession>> findByUserIdOrderByModifiedAtDesc(String userId);
 }

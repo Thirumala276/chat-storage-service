@@ -1,5 +1,7 @@
 package com.raga.chat.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,13 +11,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.time.Instant;
 import lombok.Data;
 
 @Entity
 @Table(name = "chat_messages")
 @Data
-public class ChatMessage {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ChatMessage extends AuditableEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_id_chat_messages")
@@ -25,14 +27,13 @@ public class ChatMessage {
 
   @ManyToOne
   @JoinColumn(name = "session_id", nullable = false)
+  @JsonIgnore
   private ChatSession session;
 
   private String sender;
 
   @Column(columnDefinition = "TEXT")
   private String content;
-
-  private Instant createdAt = Instant.now();
 
   @Column(columnDefinition = "vector(1536)")
   private Float[] embedding;

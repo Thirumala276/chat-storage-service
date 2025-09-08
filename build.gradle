@@ -36,10 +36,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2'
+    testImplementation 'io.projectreactor:reactor-test'
 
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.bucket4j:bucket4j-core:8.10.1'
-
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
 }
 
 tasks.named('test') {

@@ -17,6 +17,14 @@ CREATE SEQUENCE seq_id_chat_sessions
      NO MAXVALUE
      CACHE 1;
 
+  -- 1️⃣ Create sequence for ID generation
+  CREATE SEQUENCE seq_id_knowledge_base
+      START WITH 10001
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -26,8 +34,8 @@ CREATE TABLE chat_sessions (
   user_id character varying(255) NOT NULL,
   title text NOT NULL,
   favorite boolean DEFAULT false,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  created_at timestamp without time zone,
+  modified_at timestamp without time zone
 );
 
 CREATE TABLE chat_messages (
@@ -35,9 +43,19 @@ CREATE TABLE chat_messages (
   session_id bigint NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
   sender text NOT NULL,
   content text NOT NULL,
-  created_at timestamptz DEFAULT now(),
   embedding vector(1536),
-  retrieved_context TEXT
+  retrieved_context TEXT,
+  created_at timestamp without time zone,
+  modified_at timestamp without time zone
+);
+
+CREATE TABLE knowledge_base (
+    id bigint PRIMARY KEY NOT NULL,
+    title TEXT,
+    content TEXT,
+    embedding vector(1536),
+    created_at timestamp without time zone,
+    modified_at timestamp without time zone
 );
 
 

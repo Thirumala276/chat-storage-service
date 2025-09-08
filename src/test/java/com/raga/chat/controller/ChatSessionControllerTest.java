@@ -1,7 +1,10 @@
 package com.raga.chat.controller;
 
-import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.raga.chat.model.AddMessageRequest;
 import com.raga.chat.model.CreateSessionRequest;
@@ -19,7 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @WebMvcTest(ChatSessionController.class)
 class ChatSessionControllerTest {
@@ -40,7 +44,7 @@ class ChatSessionControllerTest {
 
     when(chatSessionService.createSession(req)).thenReturn(session);
 
-    ResponseEntity<ChatSession> response = chatSessionController.createSession(req);
+    var response = chatSessionController.createSession(req);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     assertThat(response.getBody()).isEqualTo(session);
@@ -51,7 +55,7 @@ class ChatSessionControllerTest {
     List<ChatSession> sessions = List.of(new ChatSession(), new ChatSession());
     when(chatSessionService.getSessionsByUserId("user1")).thenReturn(sessions);
 
-    ResponseEntity<List<ChatSession>> response = chatSessionController.getSessionsByUserId("user1");
+    var response = chatSessionController.getSessionsByUserId("user1");
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(sessions);
@@ -65,12 +69,13 @@ class ChatSessionControllerTest {
     message.setContent("Hello");
     message.setSender("user1");
 
-    when(chatSessionService.addMessage(1L, req)).thenReturn(message);
+    when(chatSessionService.addMessage(1L, req)).thenReturn(Flux.just(message));
 
-    ResponseEntity<ChatMessage> response = chatSessionController.addMessage(1L, req);
+    Flux<ChatMessage> responseFlux = chatSessionController.addMessage(1L, req);
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(response.getBody()).isEqualTo(message);
+    StepVerifier.create(responseFlux)
+                .expectNextMatches(msg -> msg.getId().equals(1L) && msg.getContent().equals("Hello"))
+                .verifyComplete();
   }
 
   @Test
@@ -121,7 +126,7 @@ class ChatSessionControllerTest {
   void testDeleteSession() {
     doNothing().when(chatSessionService).deleteSession(1L);
 
-    ResponseEntity<Void> response = chatSessionController.deleteSession(1L);
+    var response = chatSessionController.deleteSession(1L);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     verify(chatSessionService, times(1)).deleteSession(1L);

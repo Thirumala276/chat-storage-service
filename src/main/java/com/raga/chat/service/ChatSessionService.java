@@ -8,6 +8,7 @@ import com.raga.chat.persistence.entity.ChatMessage;
 import com.raga.chat.persistence.entity.ChatSession;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import reactor.core.publisher.Flux;
 
 public interface ChatSessionService {
 
@@ -19,10 +20,9 @@ public interface ChatSessionService {
 
   ChatSession markFavorite(Long sessionId, FavoriteRequest request);
 
-  ChatMessage addMessage(Long sessionId, AddMessageRequest request);
+  Flux<ChatMessage> addMessage(Long sessionId, AddMessageRequest request);
 
   ChatSession renameSession(Long sessionId, RenameRequest request);
 
   void deleteSession(Long sessionId);
-
 }
