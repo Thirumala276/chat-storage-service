@@ -14,7 +14,7 @@ For **LLM integration**, we use **Gemini Flash 2.0**, and for **knowledge retrie
 * RESTful API with **Spring Boot**
 * **Spring Data JPA** for database persistence
 * **Liquibase** for versioned DB migrations
-* **PostgreSQL + pgvector** support for vector embeddings
+* **PostgreSQL + pgvector** support for vector embeddings(cohere)
 * **RAG-ready chat history storage**
 * **Rate limiting** for API requests using **Bucket4j**
 * **API key authentication** for secure access (**X-API-KEY mandatory**)
@@ -193,7 +193,3 @@ docker-compose --env-file ./config/env/dev.env up --build
 
 ---
 
-## 📝 License
-
-Licensed under the **MIT License**.
-Feel free to use, modify, and distribute for your own purposes.

@@ -11,12 +11,13 @@ import com.raga.chat.persistence.repository.ChatMessageRepository;
 import com.raga.chat.persistence.repository.ChatSessionRepository;
 import com.raga.chat.service.ChatSessionService;
 import com.raga.chat.service.EmbeddingService;
-import com.raga.chat.service.LLMService;
 import com.raga.chat.service.KnowledgeBaseService;
+import com.raga.chat.service.LLMService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.contentstream.operator.state.Save;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,9 +36,8 @@ public class ChatSessionServiceImpl implements ChatSessionService {
   private final ChatSessionRepository chatSessionRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final KnowledgeBaseService knowledgeBaseService;
-  private final JdbcTemplate jdbcTemplate;
   private final EmbeddingService embeddingService;
-
+  private final JdbcTemplate jdbcTemplate;
 
   @Override
   public ChatSession createSession(CreateSessionRequest request) {
@@ -64,31 +64,52 @@ public class ChatSessionServiceImpl implements ChatSessionService {
   @Transactional
   @Override
   public Flux<ChatMessage> addMessage(Long sessionId, AddMessageRequest request) {
-    ChatSession session = chatSessionRepository.findById(sessionId)
-                                               .orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
+    ChatSession session = chatSessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
 
-    String content = request.content();
-    Float[] queryEmbedding = embeddingService.getEmbedding(content);
-    String vectorLiteral = embeddingService.toPgVectorLiteral(queryEmbedding);
-    List<ChatMessage> previousMessages = chatMessageRepository.findTopKByVector(jdbcTemplate, sessionId, vectorLiteral, 5);
+    String question = request.content();
 
-    String conversationContext = previousMessages.stream()
-                                                 .map(ChatMessage::getContent)
-                                                 .collect(Collectors.joining("\n"));
-    String kbContext = knowledgeBaseService.searchRelevantContext(content, 5);
+    List<ChatMessage> previousMessages = chatMessageRepository.fetchLastMessage(session, PageRequest.of(0,5));
 
+    String conversationContext = previousMessages.stream().map(ChatMessage::getContent).collect(Collectors.joining("\n"));
     // Save user message
     var userMessage = new ChatMessage();
     userMessage.setSession(session);
     userMessage.setSender(request.sender());
-    userMessage.setContent(content);
-    userMessage.setEmbedding(queryEmbedding);
+    userMessage.setContent(question);
     chatMessageRepository.save(userMessage);
 
+    String kbContext = knowledgeBaseService.searchRelevantContext(question, 5);
+
+    return getChatMessageFluxFromLLM(question, conversationContext, kbContext, session);
+  }
+
+
+  @Override
+  public ChatSession renameSession(Long sessionId, RenameRequest request) {
+    ChatSession session = chatSessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
+    session.setTitle(request.title());
+    return chatSessionRepository.save(session);
+  }
+
+  @Override
+  public void deleteSession(Long sessionId) {
+    ChatSession session = chatSessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
+    // Hard delete the session; messages are deleted automatically via cascade
+    chatSessionRepository.delete(session);
+  }
+
+  @Override
+  public ChatSession markFavorite(Long sessionId, FavoriteRequest request) {
+    ChatSession session = chatSessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
+    session.setFavorite(request.favorite());
+    return chatSessionRepository.save(session);
+  }
+
+
+  private Flux<ChatMessage> getChatMessageFluxFromLLM(String question, String conversationContext, String kbContext, ChatSession session) {
     // Stream AI response
     StringBuilder aiContentBuilder = new StringBuilder();
-
-    return llmService.generateResponseWithContext(content, conversationContext, kbContext)
+    return llmService.generateResponseWithContext(question, conversationContext, kbContext)
                      .doOnNext(aiContentBuilder::append)
                      .doOnComplete(() -> {
                        // After full response is received, save AI message
@@ -96,43 +117,16 @@ public class ChatSessionServiceImpl implements ChatSessionService {
                        aiMessage.setSession(session);
                        aiMessage.setSender("AI");
                        aiMessage.setContent(aiContentBuilder.toString());
-                       aiMessage.setEmbedding(embeddingService.getEmbedding(aiContentBuilder.toString()));
                        aiMessage.setRetrievedContext(kbContext);
                        chatMessageRepository.save(aiMessage);
                      })
                      .map(chunk -> {
                        // Optional: wrap streaming chunks as ChatMessage events
                        var message = new ChatMessage();
-                        message.setSender("AI");
-                        message.setContent(chunk);
-                        return message;
+                       message.setSession(session);
+                       message.setSender("AI");
+                       message.setContent(chunk);
+                       return message;
                      });
-  }
-
-  @Override
-  public ChatSession renameSession(Long sessionId, RenameRequest request) {
-    ChatSession session = chatSessionRepository.findById(sessionId)
-                                               .orElseThrow(() -> new ResourceNotFoundException(
-                                                 SESSION_NOT_FOUND));
-    session.setTitle(request.title());
-    return chatSessionRepository.save(session);
-  }
-
-
-  @Override
-  public void deleteSession(Long sessionId) {
-    ChatSession session = chatSessionRepository.findById(sessionId)
-                                               .orElseThrow(() -> new ResourceNotFoundException(SESSION_NOT_FOUND));
-    // Hard delete the session; messages are deleted automatically via cascade
-    chatSessionRepository.delete(session);
-  }
-
-  @Override
-  public ChatSession markFavorite(Long sessionId, FavoriteRequest request) {
-    ChatSession session = chatSessionRepository.findById(sessionId)
-                                               .orElseThrow(() -> new ResourceNotFoundException(
-                                                 SESSION_NOT_FOUND));
-    session.setFavorite(request.favorite());
-    return chatSessionRepository.save(session);
   }
 }

@@ -35,9 +35,6 @@ public class ChatMessage extends AuditableEntity {
   @Column(columnDefinition = "TEXT")
   private String content;
 
-  @Column(columnDefinition = "vector(1536)")
-  private Float[] embedding;
-
   @Column(columnDefinition = "TEXT")
   private String retrievedContext;
 }

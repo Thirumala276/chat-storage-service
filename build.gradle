@@ -39,9 +39,6 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 
     implementation 'com.bucket4j:bucket4j-core:8.10.1'
-    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
-}
 
-tasks.named('test') {
-    useJUnitPlatform()
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
 }

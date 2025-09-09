@@ -4,7 +4,7 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     jpa:
-      show-sql: true
+      show-sql: false
       hibernate:
         ddl-auto: validate
       properties:
@@ -63,3 +63,10 @@ management:
       enabled: true
     readiness-state:
       enabled: true
+
+
+cohere:
+  api-key: lD1dpzYF7dGeuMr0jaoyuXow0bFJEjyAWhJr7whv # replace with your real key
+  url: https://api.cohere.ai/v1/embed
+  model: embed-english-v3.0
+  inputType: search_document

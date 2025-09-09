@@ -3,32 +3,34 @@ package com.raga.chat.config;
 import com.raga.chat.persistence.entity.KnowledgeBase;
 import com.raga.chat.persistence.repository.KnowledgeBaseRepository;
 import com.raga.chat.service.EmbeddingService;
-import com.raga.chat.service.LLMService;
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Slf4j
+@Component
 @RequiredArgsConstructor
-public class KnowledgeBaseLoader {
+public class KnowledgeBaseLoader implements CommandLineRunner {
 
   private final KnowledgeBaseRepository kbRepository;
 
-  private final LLMService llmService;
-
   private final EmbeddingService embeddingService;
 
-  @PostConstruct
-  public void loadPDFs() throws IOException {
+  @Override
+  public void run(String... args) throws IOException {
+    loadPDFs();
+  }
+
+  private void loadPDFs() throws IOException {
     ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     Resource[] resources = resolver.getResources("classpath:kb/*.pdf");
-
     for (Resource resource : resources) {
       String title = resource.getFilename();
 
@@ -54,4 +56,3 @@ public class KnowledgeBaseLoader {
     }
   }
 }
-

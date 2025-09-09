@@ -18,17 +18,14 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
 
   private final KnowledgeBaseRepository kbRepository;
 
-  private final EmbeddingService embeddingService;
-
   private final JdbcTemplate jdbcTemplate;
 
+  private final EmbeddingService embeddingService;
+
   @Override
-  public String searchRelevantContext(String query, int topN) {
-    Float[] queryEmbedding = embeddingService.getEmbedding(query);
-    String vectorLiteral = embeddingService.toPgVectorLiteral(queryEmbedding);
-    List<KnowledgeBase> topDocs = kbRepository.findTopNSimilar(jdbcTemplate, vectorLiteral, topN);
-    return topDocs.stream()
-                  .map(KnowledgeBase::getContent)
-                  .collect(Collectors.joining("\n"));
+  public String searchRelevantContext(String question, int topN) {
+    Float[] queryEmbedding = embeddingService.getEmbedding(question);
+    List<KnowledgeBase> topDocs = kbRepository.findTopNSimilar(jdbcTemplate, queryEmbedding, topN);
+    return topDocs.stream().map(KnowledgeBase::getContent).collect(Collectors.joining("\n"));
   }
 }

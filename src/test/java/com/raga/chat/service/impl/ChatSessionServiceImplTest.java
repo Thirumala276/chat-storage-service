@@ -135,7 +135,7 @@ class ChatSessionServiceImplTest {
                        .findTopKByVector(any(JdbcTemplate.class), anyLong(), any(), anyInt());
 
     // Mock knowledge base context
-    when(knowledgeBaseService.searchRelevantContext(anyString(), anyInt()))
+    when(knowledgeBaseService.searchRelevantContext(any(), anyInt()))
       .thenReturn("KB Context");
 
     // Mock LLM streaming response

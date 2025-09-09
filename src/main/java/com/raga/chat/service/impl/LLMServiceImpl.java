@@ -3,6 +3,7 @@ package com.raga.chat.service.impl;
 import com.raga.chat.model.LLMResponse;
 import com.raga.chat.service.LLMService;
 import com.raga.chat.util.PromptTemplate;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -32,21 +33,23 @@ public class LLMServiceImpl implements LLMService {
 
   private static final int MAX_RETRIES = 3;
   private static final Duration RETRY_BACKOFF = Duration.ofSeconds(2);
+  private  WebClient webClient;
+  @PostConstruct
+  public void init() {
+    this.webClient = WebClient.builder()
+                              .baseUrl(geminiUrl)
+                              .build();
+  }
 
   @Override
   public Flux<String> generateResponseWithContext(String question, String conversationContext, String knowledgeContext) {
-    String prompt = PromptTemplate.buildPrompt(question, conversationContext, knowledgeContext);
+    String prompt = PromptTemplate.buildPrompt(conversationContext, knowledgeContext,question);
     return streamGenerateText(prompt);
   }
 
   public Flux<String> streamGenerateText(String prompt) {
-    WebClient webClient = WebClient.create(geminiUrl);
 
-    Map<String, Object> requestBody = Map.of(
-      "contents", List.of(
-        Map.of("parts", List.of(Map.of("text", prompt)))
-      )
-    );
+    Map<String, Object> requestBody = Map.of("contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))));
 
     return webClient.post()
                     .uri("/v1beta/models/{model}:streamGenerateContent", geminiModel)
