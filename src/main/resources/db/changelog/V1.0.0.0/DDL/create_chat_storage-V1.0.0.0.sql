@@ -43,7 +43,6 @@ CREATE TABLE chat_messages (
   session_id bigint NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
   sender text NOT NULL,
   content text NOT NULL,
-  embedding vector(1024),
   retrieved_context TEXT,
   created_at timestamp without time zone,
   modified_at timestamp without time zone
@@ -53,7 +52,7 @@ CREATE TABLE knowledge_base (
     id bigint PRIMARY KEY NOT NULL,
     title TEXT,
     content TEXT,
-    embedding vector(1024),
+    embedding vector(1536),
     created_at timestamp without time zone,
     modified_at timestamp without time zone
 );
