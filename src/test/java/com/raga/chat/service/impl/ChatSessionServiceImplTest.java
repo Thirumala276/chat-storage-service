@@ -132,7 +132,7 @@ class ChatSessionServiceImplTest {
 
     // Mock previous messages (using doReturn to bypass strict stubbing)
     doReturn(List.of()).when(chatMessageRepository)
-                       .findTopKByVector(any(JdbcTemplate.class), anyLong(), any(), anyInt());
+                       .fetchLastMessage(any(), any());
 
     // Mock knowledge base context
     when(knowledgeBaseService.searchRelevantContext(any(), anyInt()))

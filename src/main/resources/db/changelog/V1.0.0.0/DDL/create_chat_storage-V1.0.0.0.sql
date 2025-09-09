@@ -52,7 +52,7 @@ CREATE TABLE knowledge_base (
     id bigint PRIMARY KEY NOT NULL,
     title TEXT,
     content TEXT,
-    embedding vector(1536),
+    embedding vector(1024),
     created_at timestamp without time zone,
     modified_at timestamp without time zone
 );

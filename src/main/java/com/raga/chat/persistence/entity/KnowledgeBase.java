@@ -28,6 +28,6 @@ public class KnowledgeBase extends AuditableEntity{
   private String content;
 
   @JdbcTypeCode(SqlTypes.ARRAY)
-  @Column(columnDefinition = "vector(1536)")
+  @Column(columnDefinition = "vector(1024)")
   private Float[] embedding;
 }
