@@ -60,11 +60,4 @@ public class EmbeddingServiceImpl implements EmbeddingService {
       throw new RuntimeException(e);
     }
   }
-
-  @Override
-  public String toPgVectorLiteral(Float[] embedding) {
-    return Arrays.stream(embedding)
-                 .map(String::valueOf)
-                 .collect(Collectors.joining(",", "(", ")")); // pgvector requires (v1,v2,...)
-  }
 }
