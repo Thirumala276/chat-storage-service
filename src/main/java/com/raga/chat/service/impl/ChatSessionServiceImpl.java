@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.contentstream.operator.state.Save;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,8 +35,6 @@ public class ChatSessionServiceImpl implements ChatSessionService {
   private final ChatSessionRepository chatSessionRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final KnowledgeBaseService knowledgeBaseService;
-  private final EmbeddingService embeddingService;
-  private final JdbcTemplate jdbcTemplate;
 
   @Override
   public ChatSession createSession(CreateSessionRequest request) {
