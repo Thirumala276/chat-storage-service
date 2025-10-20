@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:chat_storage_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    jpa:
+      show-sql: false
+      hibernate:
+        ddl-auto: validate
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+    liquibase:
+      enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  connection-timeout: 100000
+  servlet:
+    context-path: /chat
+
+security:
+  api-key: ${API_KEY:dev-secure-key}
+
+openapi:
+  project-title: RAG Chat Storage API
+  project-version: 1.0.0
+  project-description: RAG Chat Storage API
+
+gemini:
+  url : https://generativelanguage.googleapis.com
+  model: gemini-2.0-flash
+  api-key: ${GEMINI_API_KEY:AIzaSyC-kwpYTB7QN0NkEpn86g1zvsFPG2EvWlU}
+
+cors:
+  allowed-origins:
+    - "https://example.com"
+    - "http://localhost:*"
+
+rate-limit:
+  capacity: 100          # max requests
+  duration-in-minutes: 1 # refill duration
+
+logging:
+  level:
+    org.springframework: DEBUG
+    org.hibernate.SQL: DEBUG                   # prints SQL queries
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # prints query parameters
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
+
+
+cohere:
+  api-key: lD1dpzYF7dGeuMr0jaoyuXow0bFJEjyAWhJr7whv # replace with your real key
+  url: https://api.cohere.ai/v1/embed
+  model: embed-english-v3.0
+  inputType: search_document

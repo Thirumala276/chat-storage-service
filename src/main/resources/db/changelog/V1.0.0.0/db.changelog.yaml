@@ -1,0 +1,16 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 1
+      author: thirumalaiah regatti
+
+  - include:
+      file: DDL/create_chat_storage-V1.0.0.0.sql
+      relativeToChangelogFile: true
+
+
+
+
+
+
+

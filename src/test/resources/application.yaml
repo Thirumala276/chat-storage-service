@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: sa
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        show_sql: true
+  liquibase:
+    default_schema: test
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    contexts: no_db_setup
+    enabled: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  connection-timeout: 100000
+  servlet:
+    contextPath: /chat
+
+security:
+  api-key: ${API_KEY:dev-secure-key}
+
+
+openapi:
+  project-title: RAG Chat Storage API
+  project-version: 1.0.0
+  project-description: RAG Chat Storage API
+
+gemini:
+  model: gemini-2.0-flash
+  api-key: AIzaSyC-kwpYTB7QN0NkEpn86g1zvsFPG2EvWlU
+
+
+cors:
+  allowed-origins:
+    - "https://example.com"
+    - "http://localhost:*"
+
+rate-limit:
+  capacity: 100        # max requests
+  duration-in-minutes: 1  # refill duration
+
+
+logging:
+  level:
+    org.springframework: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
